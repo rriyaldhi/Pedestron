@@ -57,14 +57,14 @@ def run_detector_on_dataset():
     while(cap.isOpened()):
         ok, frame = cap.read()
         if ok:
-            # results = inference_detector(model, frame)
-            # result_frame = show_result(frame, results, model.CLASSES, out_file=None)
+            results = inference_detector(model, frame)
+            result_frame = show_result(frame, results, model.CLASSES, out_file=i + "_result.jpg")
             out.write(frame)
         else:
             break
         prog_bar.update()
         i += 1
-        if i == 100:
+        if i == 5:
             break
     out.release()
     cap.release()
