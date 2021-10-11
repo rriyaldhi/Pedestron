@@ -49,18 +49,18 @@ def run_detector_on_dataset(video):
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = int(cap.get(cv2.CAP_PROP_FPS))
+    length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     out = cv2.VideoWriter('videos/output/' + video, cv2.VideoWriter_fourcc('m','p', '4', 'v'), fps, (width,height))
-    i = 0
+    prog_bar = mmcv.ProgressBar(length)
     while(cap.isOpened()):
         ok, frame = cap.read()
-        print(i)
-        i += 1
         if ok:
             results = inference_detector(model, frame)
             result_frame = show_result(frame, results, model.CLASSES, out_file=None)
             out.write(result_frame)
         else:
             break
+        prog_bar.update()
     out.release()
     cap.release()
 
