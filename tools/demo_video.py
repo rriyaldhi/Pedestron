@@ -19,6 +19,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='MMDet test detector')
     parser.add_argument('config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file')
+    parser.add_argument('input_video', type=str, help='video file name')
     parser.add_argument('output_dir', type=str, help='the dir for result images')
     parser.add_argument(
         '--launcher',
@@ -35,9 +36,9 @@ def create_base_dir(dest):
     if not os.path.exists(basedir):
         os.makedirs(basedir)
 
-def run_detector_on_dataset(video):
+def run_detector_on_dataset():
     args = parse_args()
-    # input_dir = args.input_img_dir
+    input_video = args.input_video
     output_dir = args.output_dir
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -45,12 +46,12 @@ def run_detector_on_dataset(video):
     model = init_detector(
         args.config, args.checkpoint, device=torch.device('cuda:0'))
 
-    cap = cv2.VideoCapture('videos/' + video)
+    cap = cv2.VideoCapture('videos/' + input_video)
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    out = cv2.VideoWriter('videos/output/' + video, cv2.VideoWriter_fourcc('m','p', '4', 'v'), fps, (width,height))
+    out = cv2.VideoWriter('videos/output/' + input_video, cv2.VideoWriter_fourcc('m','p', '4', 'v'), fps, (width,height))
     prog_bar = mmcv.ProgressBar(length)
     i = 0
     while(cap.isOpened()):
@@ -111,4 +112,4 @@ def show_result(img, result, class_names, score_thr=0.3, out_file=None):
         out_file=out_file)
 
 if __name__ == '__main__':
-    run_detector_on_dataset('n.mp4')
+    run_detector_on_dataset()
