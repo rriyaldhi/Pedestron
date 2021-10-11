@@ -57,9 +57,9 @@ def run_detector_on_dataset():
     while(cap.isOpened()):
         ok, frame = cap.read()
         if ok:
-            results = inference_detector(model, frame)
-            result_frame = show_result(frame, results, model.CLASSES, out_file=None)
-            out.write(result_frame)
+            # results = inference_detector(model, frame)
+            # result_frame = show_result(frame, results, model.CLASSES, out_file=None)
+            out.write(frame)
         else:
             break
         prog_bar.update()
