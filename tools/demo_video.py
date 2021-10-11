@@ -50,8 +50,11 @@ def run_detector_on_dataset(video):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     out = cv2.VideoWriter('videos/output/' + video, cv2.VideoWriter_fourcc('m','p', '4', 'v'), fps, (width,height))
+    i = 0
     while(cap.isOpened()):
         ok, frame = cap.read()
+        print(i)
+        i += 1
         if ok:
             results = inference_detector(model, frame)
             result_frame = show_result(frame, results, model.CLASSES, out_file=None)
