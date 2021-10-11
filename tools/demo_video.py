@@ -58,7 +58,7 @@ def run_detector_on_dataset():
         ok, frame = cap.read()
         if ok:
             results = inference_detector(model, frame)
-            result_frame = show_result(frame, results, model.CLASSES, out_file=i + "_result.jpg")
+            result_frame = show_result(frame, results, model.CLASSES, out_file=str(i) + "_result.jpg")
             out.write(frame)
         else:
             break
