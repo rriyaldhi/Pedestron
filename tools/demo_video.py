@@ -55,20 +55,15 @@ def run_detector_on_dataset():
     length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     out = cv2.VideoWriter('videos/output/' + input_video, cv2.VideoWriter_fourcc('m','p', '4', 'v'), fps, (width,height))
     prog_bar = mmcv.ProgressBar(length)
-    i = 0
     while(cap.isOpened()):
         ok, frame = cap.read()
         if ok:
             results = inference_detector(model, frame)
             result_frame = show_result(frame, results, model.CLASSES)
-            imwrite(result_frame, str(i) + '_result.jpg')
             out.write(result_frame)
         else:
             break
         prog_bar.update()
-        i += 1
-        if i == 5:
-            break
     out.release()
     cap.release()
 
