@@ -12,6 +12,8 @@ import json
 import mmcv
 import numpy as np
 import pycocotools.mask as maskUtils
+from mmcv.image import imread, imwrite
+from mmcv.visualization import color_val
 
 from mmdet.apis import inference_detector, init_detector
 
@@ -58,8 +60,9 @@ def run_detector_on_dataset():
         ok, frame = cap.read()
         if ok:
             results = inference_detector(model, frame)
-            result_frame = show_result(frame, results, model.CLASSES, out_file=str(i) + "_result.jpg")
-            out.write(frame)
+            result_frame = show_result(frame, results, model.CLASSES)
+            imwrite(result_frame, str(i) + '_result.jpg')
+            out.write(result_frame)
         else:
             break
         prog_bar.update()
@@ -102,7 +105,7 @@ def show_result(img, result, class_names, score_thr=0.3, out_file=None):
         for i, bbox in enumerate(bbox_result)
     ]
     labels = np.concatenate(labels)
-    return mmcv.imshow_det_bboxes(
+    return imshow_det_bboxes(
         img.copy(),
         bboxes,
         labels,
@@ -110,6 +113,63 @@ def show_result(img, result, class_names, score_thr=0.3, out_file=None):
         score_thr=score_thr,
         show=False,
         out_file=out_file)
+
+def imshow_det_bboxes(img,
+                      bboxes,
+                      labels,
+                      class_names=None,
+                      score_thr=0,
+                      bbox_color='green',
+                      text_color='green',
+                      thickness=1,
+                      font_scale=0.5,
+                      show=True,
+                      win_name='',
+                      wait_time=0,
+                      out_file=None):
+    """Draw bboxes and class labels (with scores) on an image.
+    Args:
+        img (str or ndarray): The image to be displayed.
+        bboxes (ndarray): Bounding boxes (with scores), shaped (n, 4) or
+            (n, 5).
+        labels (ndarray): Labels of bboxes.
+        class_names (list[str]): Names of each classes.
+        score_thr (float): Minimum score of bboxes to be shown.
+        bbox_color (str or tuple or :obj:`Color`): Color of bbox lines.
+        text_color (str or tuple or :obj:`Color`): Color of texts.
+        thickness (int): Thickness of lines.
+        font_scale (float): Font scales of texts.
+        show (bool): Whether to show the image.
+        win_name (str): The window name.
+        wait_time (int): Value of waitKey param.
+        out_file (str or None): The filename to write the image.
+    Returns:
+        ndarray: The image with bboxes drawn on it.
+    """
+    assert bboxes.ndim == 2
+    assert labels.ndim == 1
+    assert bboxes.shape[0] == labels.shape[0]
+    assert bboxes.shape[1] == 4 or bboxes.shape[1] == 5
+    img = imread(img)
+    img = np.ascontiguousarray(img)
+
+    if score_thr > 0:
+        assert bboxes.shape[1] == 5
+        scores = bboxes[:, -1]
+        inds = scores > score_thr
+        bboxes = bboxes[inds, :]
+        labels = labels[inds]
+
+    bbox_color = color_val(bbox_color)
+
+    for bbox, label in zip(bboxes, labels):
+        bbox_int = bbox.astype(np.int32)
+        left_top = (bbox_int[0], bbox_int[1])
+        right_bottom = (bbox_int[2], bbox_int[3])
+        cv2.rectangle(
+            img, left_top, right_bottom, bbox_color, thickness=thickness)
+
+    return img
 
 if __name__ == '__main__':
     run_detector_on_dataset()
