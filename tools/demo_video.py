@@ -22,7 +22,6 @@ def parse_args():
     parser.add_argument('config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file')
     parser.add_argument('input_video', type=str, help='video file name')
-    parser.add_argument('output_dir', type=str, help='the dir for result images')
     parser.add_argument(
         '--launcher',
         choices=['none', 'pytorch', 'slurm', 'mpi'],
@@ -41,9 +40,6 @@ def create_base_dir(dest):
 def run_detector_on_dataset():
     args = parse_args()
     input_video = args.input_video
-    output_dir = args.output_dir
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
 
     model = init_detector(
         args.config, args.checkpoint, device=torch.device('cuda:0'))
@@ -59,7 +55,7 @@ def run_detector_on_dataset():
     while(cap.isOpened()):
         if i == 10:
             break
-        i++
+        i += 1
         ok, frame = cap.read()
         if ok:
             results = inference_detector(model, frame)
