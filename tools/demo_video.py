@@ -157,8 +157,15 @@ def imshow_det_bboxes(img,
         bbox_int = bbox.astype(np.int32)
         left_top = (bbox_int[0], bbox_int[1])
         right_bottom = (bbox_int[2], bbox_int[3])
-        cv2.rectangle(
-            img, left_top, right_bottom, bbox_color, thickness=thickness)
+
+        # cv2.rectangle(
+        #     img, left_top, right_bottom, bbox_color, thickness=thickness)
+
+        x, y = left_top[0], left_top[1]
+        w, h = right_bottom[0] - left_top[0], right_bottom[1] - left_top[1]
+        roi = img[y:y+h, x:x+w]
+        blur = cv2.GaussianBlur(roi, (101, 101), 0)
+        img[y:y+h, x:x+w] = blur
 
     return img
 
